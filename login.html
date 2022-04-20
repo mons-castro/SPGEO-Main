@@ -30,34 +30,36 @@
 						Inicia Sesión
 					</span>
 
-
-                <div class="wrap-input100 validate-input" data-validate="Valid email is required: ex@abc.xyz">
-                    <input class="input100" type="text" name="email">
-                    <span class="focus-input100"></span>
-                    <span class="label-input100">Correo Electrónico</span>
-                </div>
-
-
-                <div class="wrap-input100 validate-input" data-validate="Password is required">
-                    <input class="input100" type="password" name="pass">
-                    <span class="focus-input100"></span>
-                    <span class="label-input100">Contraseña</span>
-                </div>
-
-                <div class="flex-sb-m w-full p-t-3 p-b-32">
-                    <div>
-                        <a href="#" class="txt1">
-                            ¿Olvidaste tu contraseña?
-                        </a>
+                <div id="error-msg" class="alert alert-danger" role="alert"></div>
+                <form id="login-form" action="./connect/login.php" method="post" name="login-form">
+                    <div class="wrap-input100 validate-input" data-validate="Valid email is required: ex@abc.xyz">
+                        <input class="input100" type="text" name="email">
+                        <span class="focus-input100"></span>
+                        <span class="label-input100">Correo Electrónico</span>
                     </div>
-                </div>
 
 
-                <div class="container-login100-form-btn">
-                    <button name="loginButton" class="login100-form-btn">
-                        Iniciar Sesión
-                    </button>
-                </div>
+                    <div class="wrap-input100 validate-input" data-validate="Password is required">
+                        <input class="input100" type="password" name="pass">
+                        <span class="focus-input100"></span>
+                        <span class="label-input100">Contraseña</span>
+                    </div>
+
+                    <div class="flex-sb-m w-full p-t-3 p-b-32">
+                        <div>
+                            <a href="#" class="txt1">
+                                ¿Olvidaste tu contraseña?
+                            </a>
+                        </div>
+                    </div>
+
+
+                    <div class="container-login100-form-btn">
+                        <button id="login" name="loginButton" class="login100-form-btn">
+                            Iniciar Sesión
+                        </button>
+                    </div>
+                </form>
             </section>
 
             <div class="login100-more" style="background-image: url('https://source.unsplash.com/8mikJ83LmSQ');">
@@ -65,12 +67,59 @@
         </div>
     </div>
 </div>
-
-
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/js/bootstrap.min.js"></script>
-<script src="assets/js/main.js"></script>
+
+
+
+<script>
+        $(function() {
+            $("#error-msg").hide(); 
+            $('#login').click(function(e) {
+ 
+                let self = $(this);
+ 
+                e.preventDefault(); // prevent default submit behavior
+ 
+                self.prop('disabled', true);
+ 
+                var data = $('#login-form').serialize(); // get form data
+ 
+                // sending ajax request to login.php file, it will process login request and give response.
+                $.ajax({
+                    url: './connect/login.php',
+                    type: "POST",
+                    data: data,
+                    dataType:'JSON',
+                    success: function(res){
+                        if (res['status']) // if login successful redirect user to secure.php page.
+                    {
+                        //window.location.href = "./connect/secure.php"; // redirect user to secure.php location/page.
+                    } else {
+ 
+                        var errorMessage = '';
+                        // if there is any errors convert array of errors into html string, 
+                        //here we are wrapping errors into a paragraph tag.
+                        console.log(res.msg);
+                        $.each(res['msg'], function(index, message) {
+                            errorMessage += '<div>' + message + '</div>';
+                        });
+                        // place the errors inside the div#error-msg.
+                        $("#error-msg").html(errorMessage);
+                        $("#error-msg").show(); // show it on the browser, default state, hide
+                        // remove disable attribute to the login button, 
+                        //to prevent multiple form submissions 
+                        //we have added this attribution on login from submit
+                    }
+                    
+
+                    }
+                });
+             });
+        });
+    </script>
+
 </body>
 
 </html>
